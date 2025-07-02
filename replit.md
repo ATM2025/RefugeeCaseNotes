@@ -113,6 +113,13 @@ This is a full-stack web application for managing refugee case notes in a humani
 - **Database**: Drizzle migrations for schema deployment
 - **Assets**: Static file serving through Express
 
+### Vercel Deployment Support
+- **Configuration**: vercel.json with serverless function setup
+- **API Routes**: Simplified API handlers in `/api` directory for Vercel compatibility
+- **Static Assets**: Frontend builds to `dist/public` for Vercel static hosting
+- **Environment Variables**: DATABASE_URL, SESSION_SECRET, REPL_ID required in Vercel
+- **Limitations**: File uploads need cloud storage adaptation for serverless environment
+
 ### Configuration Management
 - **Environment Variables**: DATABASE_URL, SESSION_SECRET, REPL_ID
 - **Build Scripts**: Separate dev/build/start commands
@@ -123,6 +130,12 @@ This is a full-stack web application for managing refugee case notes in a humani
 ```
 Changelog:
 - July 02, 2025. Initial setup
+- July 02, 2025. Added Vercel deployment support:
+  - Created vercel.json configuration for serverless deployment
+  - Built API handlers compatible with Vercel Functions
+  - Added deployment documentation (DEPLOYMENT.md)
+  - Configured simplified routing for production deployment
+  - Set up environment variable requirements
 ```
 
 ## User Preferences

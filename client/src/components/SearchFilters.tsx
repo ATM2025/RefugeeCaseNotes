@@ -17,7 +17,9 @@ interface SearchFiltersProps {
 
 export default function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) {
   const updateFilter = (key: string, value: string) => {
-    onFiltersChange({ ...filters, [key]: value });
+    // Convert "all" values back to empty strings for the API
+    const actualValue = value === "all" ? "" : value;
+    onFiltersChange({ ...filters, [key]: actualValue });
   };
 
   const clearFilters = () => {
@@ -63,12 +65,12 @@ export default function SearchFilters({ filters, onFiltersChange }: SearchFilter
             <Label htmlFor="program-filter" className="block text-sm font-medium text-gray-700 mb-2">
               Program Area
             </Label>
-            <Select value={filters.programArea} onValueChange={(value) => updateFilter('programArea', value)}>
+            <Select value={filters.programArea || "all"} onValueChange={(value) => updateFilter('programArea', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="All Programs" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Programs</SelectItem>
+                <SelectItem value="all">All Programs</SelectItem>
                 <SelectItem value="RCA">RCA</SelectItem>
                 <SelectItem value="Medical">Medical</SelectItem>
                 <SelectItem value="SAS">SAS</SelectItem>
@@ -84,12 +86,12 @@ export default function SearchFilters({ filters, onFiltersChange }: SearchFilter
             <Label htmlFor="date-filter" className="block text-sm font-medium text-gray-700 mb-2">
               Date Range
             </Label>
-            <Select value={filters.dateRange} onValueChange={(value) => updateFilter('dateRange', value)}>
+            <Select value={filters.dateRange || "all"} onValueChange={(value) => updateFilter('dateRange', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="All Dates" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Dates</SelectItem>
+                <SelectItem value="all">All Dates</SelectItem>
                 <SelectItem value="today">Today</SelectItem>
                 <SelectItem value="week">This Week</SelectItem>
                 <SelectItem value="month">This Month</SelectItem>

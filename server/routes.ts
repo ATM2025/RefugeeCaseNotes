@@ -111,8 +111,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(caseNote);
     } catch (error) {
       console.error("Error creating case note:", error);
-      if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid data", errors: (error as any).errors });
       }
       res.status(500).json({ message: "Failed to create case note" });
     }
@@ -138,8 +138,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedCaseNote);
     } catch (error) {
       console.error("Error updating case note:", error);
-      if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid data", errors: (error as any).errors });
       }
       res.status(500).json({ message: "Failed to update case note" });
     }

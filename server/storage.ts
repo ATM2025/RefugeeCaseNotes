@@ -170,7 +170,7 @@ export class DatabaseStorage implements IStorage {
         return {
           ...note,
           attachments: noteAttachments,
-        };
+        } as CaseNoteWithDetails;
       })
     );
 
@@ -204,7 +204,7 @@ export class DatabaseStorage implements IStorage {
     return {
       ...note,
       attachments: noteAttachments,
-    };
+    } as CaseNoteWithDetails;
   }
 
   async updateCaseNote(id: number, updates: Partial<InsertCaseNote>): Promise<CaseNote> {

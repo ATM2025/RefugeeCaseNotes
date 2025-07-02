@@ -100,6 +100,6 @@ export type Attachment = typeof attachments.$inferSelect;
 
 // Extended types for API responses
 export type CaseNoteWithDetails = CaseNote & {
-  caseworker: Pick<User, 'id' | 'firstName' | 'lastName' | 'role'>;
+  caseworker: Pick<User, 'id' | 'firstName' | 'lastName' | 'role'> | null;
   attachments: Attachment[];
 };

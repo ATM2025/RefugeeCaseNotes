@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +10,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-// Removed auth dependencies for direct access
-import { apiRequest } from "@/lib/queryClient";
 import { insertCaseNoteSchema } from "@/types";
 import { format } from "date-fns";
 import { X, CloudUpload, Save, FileText, Image } from "lucide-react";
@@ -31,8 +28,6 @@ interface CaseNoteFormProps {
 
 export default function CaseNoteForm({ onClose, onSuccess }: CaseNoteFormProps) {
   const { toast } = useToast();
-  // Default caseworker since no auth
-  const queryClient = useQueryClient();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const form = useForm<FormData>({
@@ -52,46 +47,18 @@ export default function CaseNoteForm({ onClose, onSuccess }: CaseNoteFormProps) 
     },
   });
 
-  const createCaseNoteMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      const response = await apiRequest('POST', '/api/case-notes', data);
-      return response.json();
-    },
-    onSuccess: async (newCaseNote) => {
-      // Upload files if any
-      if (selectedFiles.length > 0) {
-        const formData = new FormData();
-        selectedFiles.forEach(file => {
-          formData.append('files', file);
-        });
-
-        try {
-          await apiRequest('POST', `/api/case-notes/${newCaseNote.id}/attachments`, formData);
-        } catch (error) {
-          console.error('Error uploading files:', error);
-          toast({
-            title: "Warning",
-            description: "Case note created but file upload failed",
-            variant: "destructive",
-          });
-        }
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['/api/case-notes'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
-      onSuccess();
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to create case note",
-        variant: "destructive",
-      });
-    },
-  });
+  // Demo submission function
+  const handleDemoSubmit = (data: FormData) => {
+    // Simulate successful submission
+    toast({
+      title: "Demo Mode",
+      description: `Case note for ${data.clientName} would be created with ${selectedFiles.length} attachments`,
+    });
+    onSuccess();
+  };
 
   const onSubmit = (data: FormData) => {
-    createCaseNoteMutation.mutate(data);
+    handleDemoSubmit(data);
   };
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -331,20 +298,10 @@ export default function CaseNoteForm({ onClose, onSuccess }: CaseNoteFormProps) 
               </Button>
               <Button 
                 type="submit" 
-                disabled={createCaseNoteMutation.isPending}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                {createCaseNoteMutation.isPending ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Saving...
-                  </div>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Case Note
-                  </>
-                )}
+                <Save className="w-4 h-4 mr-2" />
+                Create Case Note (Demo)
               </Button>
             </div>
           </form>

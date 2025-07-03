@@ -9,7 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Paperclip, Edit, Trash2, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
-import type { CaseNoteWithDetails } from "@shared/schema";
+import type { CaseNoteWithDetails } from "@/types";
 
 interface CaseNotesListProps {
   filters: {

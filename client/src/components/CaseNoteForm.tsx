@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
-import { insertCaseNoteSchema } from "@shared/schema";
+import { insertCaseNoteSchema } from "@/types";
 import { format } from "date-fns";
 import { X, CloudUpload, Save, FileText, Image } from "lucide-react";
 import { z } from "zod";
@@ -39,10 +39,17 @@ export default function CaseNoteForm({ onClose, onSuccess }: CaseNoteFormProps) 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      programArea: '',
-      translationProvided: false,
-      narrative: '',
+      caseNumber: '',
+      programArea: 'RCA',
       caseworkerId: user?.id || '',
+      clientName: '',
+      clientAge: undefined,
+      clientGender: undefined,
+      notes: '',
+      translationProvided: false,
+      followUpRequired: false,
+      followUpDate: undefined,
+      priority: 'Medium',
     },
   });
 

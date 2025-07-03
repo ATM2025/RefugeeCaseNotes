@@ -11,8 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { isUnauthorizedError } from "@/lib/authUtils";
+// Removed auth dependencies for direct access
 import { apiRequest } from "@/lib/queryClient";
 import { insertCaseNoteSchema } from "@/types";
 import { format } from "date-fns";
@@ -32,7 +31,7 @@ interface CaseNoteFormProps {
 
 export default function CaseNoteForm({ onClose, onSuccess }: CaseNoteFormProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
+  // Default caseworker since no auth
   const queryClient = useQueryClient();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
@@ -41,7 +40,7 @@ export default function CaseNoteForm({ onClose, onSuccess }: CaseNoteFormProps) 
     defaultValues: {
       caseNumber: '',
       programArea: 'RCA',
-      caseworkerId: user?.id || '',
+      caseworkerId: 'default-caseworker',
       clientName: '',
       clientAge: undefined,
       clientGender: undefined,
@@ -82,18 +81,7 @@ export default function CaseNoteForm({ onClose, onSuccess }: CaseNoteFormProps) 
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
       onSuccess();
     },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to create case note",
@@ -146,11 +134,8 @@ export default function CaseNoteForm({ onClose, onSuccess }: CaseNoteFormProps) 
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const displayName = user?.firstName && user?.lastName 
-    ? `${user.firstName} ${user.lastName}`
-    : user?.email || 'User';
-
-  const userRole = user?.role || 'Caseworker';
+  const displayName = 'Default Caseworker';
+  const userRole = 'Caseworker';
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
@@ -254,7 +239,7 @@ export default function CaseNoteForm({ onClose, onSuccess }: CaseNoteFormProps) 
             {/* Narrative Field */}
             <FormField
               control={form.control}
-              name="narrative"
+              name="notes"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+// Removed auth imports for direct access
 import { insertCaseNoteSchema, insertAttachmentSchema } from "@shared/schema";
 import multer from "multer";
 import path from "path";
@@ -37,23 +37,10 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
-
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  // Removed auth middleware for direct access
 
   // Case notes routes
-  app.get('/api/case-notes', isAuthenticated, async (req: any, res) => {
+  app.get('/api/case-notes', async (req: any, res) => {
     try {
       const {
         programArea,
@@ -83,7 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/case-notes/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/case-notes/:id', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const caseNote = await storage.getCaseNote(id);
@@ -99,9 +86,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/case-notes', isAuthenticated, async (req: any, res) => {
+  app.post('/api/case-notes', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = "default-user";
       const validatedData = insertCaseNoteSchema.parse({
         ...req.body,
         caseworkerId: userId,
@@ -118,10 +105,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/case-notes/:id', isAuthenticated, async (req: any, res) => {
+  app.put('/api/case-notes/:id', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = "default-user";
       
       // Check if the case note exists and belongs to the user
       const existingNote = await storage.getCaseNote(id);
@@ -145,10 +132,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/case-notes/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/case-notes/:id', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = "default-user";
       
       // Check if the case note exists and belongs to the user
       const existingNote = await storage.getCaseNote(id);
@@ -169,10 +156,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // File upload routes
-  app.post('/api/case-notes/:id/attachments', isAuthenticated, upload.array('files', 5), async (req: any, res) => {
+  app.post('/api/case-notes/:id/attachments', upload.array('files', 5), async (req: any, res) => {
     try {
       const caseNoteId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = "default-user";
       
       // Check if the case note exists and belongs to the user
       const existingNote = await storage.getCaseNote(caseNoteId);
@@ -210,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/attachments/:id/download', isAuthenticated, async (req: any, res) => {
+  app.get('/api/attachments/:id/download', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const attachments = await storage.getAttachments(0); // This would need refinement
@@ -225,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/attachments/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/attachments/:id', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       // Implementation would verify ownership and delete file from disk
@@ -238,9 +225,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Dashboard stats
-  app.get('/api/dashboard/stats', isAuthenticated, async (req: any, res) => {
+  app.get('/api/dashboard/stats', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = "default-user";
       const stats = await storage.getDashboardStats(userId);
       res.json(stats);
     } catch (error) {

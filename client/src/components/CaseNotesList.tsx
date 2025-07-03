@@ -248,7 +248,7 @@ export default function CaseNotesList({ filters }: CaseNotesListProps) {
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900 max-w-xs truncate">
-                      {note.narrative}
+                      {note.notes}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
